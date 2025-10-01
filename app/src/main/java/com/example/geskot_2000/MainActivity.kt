@@ -157,7 +157,6 @@ fun ListaEstaciones(estaciones: List<Estacion>, modifier: Modifier = Modifier) {
                     estacion.bicisDisponibles < 5 -> Color.Yellow
                     else -> Color.Green
                 }
-                val textColor = if (estacion.bicisDisponibles < 5 && estacion.bicisDisponibles > 0) Color.Black else Color.White
 
                 Box(
                     modifier = Modifier
@@ -170,7 +169,6 @@ fun ListaEstaciones(estaciones: List<Estacion>, modifier: Modifier = Modifier) {
                     Text(
                         text = "${estacion.bicisDisponibles}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = textColor,
                         textAlign = TextAlign.Center
                     )
                 }
