@@ -5,13 +5,16 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.geskot_2000.ui.theme.GesKot2000Theme
 import retrofit2.*
@@ -53,7 +56,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://valencia.opendatasoft.com/")
+            .baseUrl("https://valencia.opendatasoft.com/  ")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -62,7 +65,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             GesKot2000Theme {
                 var estaciones by remember { mutableStateOf<List<Estacion>>(emptyList()) }
-
 
                 LaunchedEffect(Unit) {
                     api.getStations().enqueue(object : Callback<ValenbisiResponse> {
@@ -96,29 +98,84 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 @Composable
 fun ListaEstaciones(estaciones: List<Estacion>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(estaciones) { estacion ->
-            val color = when {
-                estacion.bicisDisponibles == 0 -> Color.Red
-                estacion.bicisDisponibles < 5 -> Color.Yellow
-                else -> Color.Green
-            }
 
-            Card(
+        item {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                colors = CardDefaults.cardColors(containerColor = color)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text("Dirección: ${estacion.direccion}", color = Color.White)
-                    Text("Bicis disponibles: ${estacion.bicisDisponibles}", color = Color.White)
-                    Text("Espacios libres: ${estacion.espaciosLibres}", color = Color.White)
+                Text(
+                    text = "Dirección",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(2f)
+                )
+                Text(
+                    text = "Libres",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "Bicis",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Divider(modifier = Modifier.padding(horizontal = 16.dp))
+        }
+
+        items(estaciones) { estacion ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = estacion.direccion,
+                    modifier = Modifier.weight(2f),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "${estacion.espaciosLibres}",
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+
+                val backgroundColor = when {
+                    estacion.bicisDisponibles == 0 -> Color.Red
+                    estacion.bicisDisponibles < 5 -> Color.Yellow
+                    else -> Color.Green
+                }
+                val textColor = if (estacion.bicisDisponibles < 5 && estacion.bicisDisponibles > 0) Color.Black else Color.White
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .background(backgroundColor)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "${estacion.bicisDisponibles}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = textColor,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
+            Divider(modifier = Modifier.padding(horizontal = 16.dp))
         }
     }
 }
